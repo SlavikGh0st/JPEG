@@ -3,27 +3,27 @@ using System.Threading.Tasks;
 
 namespace JPEG.NT.FreqTransformers
 {
-    public class ParallelDct8X8Transformer : IFreqTransformer<double>
+    public class ParallelDct8X8Transformer : IFreqTransformer<float>
     {
-        private static readonly double[,] CosTable = new double[8, 8];
-        private static readonly double CoefAlpha = 1 / Math.Sqrt(2);
+        private static readonly float[,] CosTable = new float[8, 8];
+        private static readonly float CoefAlpha = 1 / (float) Math.Sqrt(2);
 
         public ParallelDct8X8Transformer()
         {
             for (var j = 0; j < 8; j++)
             for (var i = 0; i < 8; i++)
-                CosTable[j, i] = Math.Cos((2 * j + 1) * i * Math.PI / 16);
+                CosTable[j, i] = (float) Math.Cos((2 * j + 1) * i * (float) Math.PI / 16);
         }
         
-        public double[,] FreqTransform2D(double[,] input)
+        public float[,] FreqTransform2D(float[,] input)
         {
-            var dct = new double[8, 8];
+            var dct = new float[8, 8];
 
             Parallel.For(0, 8, v =>
             {
                 for (var u = 0; u < 8; u++)
                 {
-                    var sum = 0d;
+                    var sum = 0f;
                     for (var y = 0; y < 8; y++)
                     for (var x = 0; x < 8; x++)
                     {
@@ -37,15 +37,15 @@ namespace JPEG.NT.FreqTransformers
             return dct;
         }
 
-        public double[,] IFreqTransform2D(double[,] dct)
+        public float[,] IFreqTransform2D(float[,] dct)
         {
-            var output = new double[8, 8];
+            var output = new float[8, 8];
 
             Parallel.For(0, 8, y =>
             {
                 for (var x = 0; x < 8; x++)
                 {
-                    var sum = 0d;
+                    var sum = 0f;
                     for (var v = 0; v < 8; v++)
                     for (var u = 0; u < 8; u++)
                     {
@@ -59,14 +59,14 @@ namespace JPEG.NT.FreqTransformers
             return output;
         }
         
-        private static double BasisFunction(double a, int u, int v, int x, int y)
+        private static float BasisFunction(float a, int u, int v, int x, int y)
         {
             var b = CosTable[x, u];
             var c = CosTable[y, v];
             return a * b * c;
         }
 
-        private static double Alpha(int u)
+        private static float Alpha(int u)
         {
             if (u == 0)
                 return CoefAlpha;

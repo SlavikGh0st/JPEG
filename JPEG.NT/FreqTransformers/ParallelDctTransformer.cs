@@ -3,21 +3,21 @@ using System.Threading.Tasks;
 
 namespace JPEG.NT.FreqTransformers
 {
-    public class ParallelDctTransformer : IFreqTransformer<double>
+    public class ParallelDctTransformer : IFreqTransformer<float>
     {
-        private static readonly double CoefAlpha = 1 / Math.Sqrt(2);
-        
-        public double[,] FreqTransform2D(double[,] input)
+        private static readonly float CoefAlpha = 1 / (float) Math.Sqrt(2);
+
+        public float[,] FreqTransform2D(float[,] input)
         {
             var height = input.GetLength(0);
             var width = input.GetLength(1);
-            var dct = new double[height, width];
+            var dct = new float[height, width];
 
             Parallel.For(0, height, v =>
             {
                 for (var u = 0; u < width; u++)
                 {
-                    var sum = 0d;
+                    var sum = 0f;
                     for (var y = 0; y < height; y++)
                     for (var x = 0; x < width; x++)
                     {
@@ -31,17 +31,17 @@ namespace JPEG.NT.FreqTransformers
             return dct;
         }
 
-        public double[,] IFreqTransform2D(double[,] dct)
+        public float[,] IFreqTransform2D(float[,] dct)
         {
             var height = dct.GetLength(0);
             var width = dct.GetLength(1);
-            var output = new double[height, width];
+            var output = new float[height, width];
 
             Parallel.For(0, height, y =>
             {
                 for (var x = 0; x < width; x++)
                 {
-                    var sum = 0d;
+                    var sum = 0f;
                     for (var v = 0; v < height; v++)
                     for (var u = 0; u < width; u++)
                     {
@@ -54,25 +54,25 @@ namespace JPEG.NT.FreqTransformers
 
             return output;
         }
-        
-        private static double BasisFunction(double a, int u, int v, int x, int y, int width, int height)
+
+        private static float BasisFunction(float a, int u, int v, int x, int y, int width, int height)
         {
-            var b = Math.Cos(((2d * x + 1d) * u * Math.PI) / (2 * width));
-            var c = Math.Cos(((2d * y + 1d) * v * Math.PI) / (2 * height));
+            var b = (float) Math.Cos(((2d * x + 1d) * u * (float) Math.PI) / (2 * width));
+            var c = (float) Math.Cos(((2d * y + 1d) * v * (float) Math.PI) / (2 * height));
 
             return a * b * c;
         }
 
-        private static double Alpha(int u)
+        private static float Alpha(int u)
         {
             if (u == 0)
                 return CoefAlpha;
             return 1;
         }
 
-        private static double Beta(int height, int width)
+        private static float Beta(int height, int width)
         {
-            return 1d / width + 1d / height;
+            return 1f / width + 1f / height;
         }
     }
 }

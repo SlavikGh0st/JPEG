@@ -2,21 +2,21 @@
 {
     public struct Pixel
     {
-        public double FirstComponent { get; set; }
-        public double SecondComponent { get; set; }
-        public double ThirdComponent { get; set; }
+        public float FirstComponent { get; set; }
+        public float SecondComponent { get; set; }
+        public float ThirdComponent { get; set; }
         
         public PixelFormat Format { get; }
 
-        public double R => Format == PixelFormat.Rgb ? FirstComponent : (298.082 * FirstComponent + 408.583 * ThirdComponent) / 256.0 - 222.921;
-        public double G => Format == PixelFormat.Rgb ? SecondComponent : (298.082 * FirstComponent - 100.291 * SecondComponent - 208.120 * ThirdComponent) / 256.0 + 135.576;
-        public double B => Format == PixelFormat.Rgb ? ThirdComponent : (298.082 * FirstComponent + 516.412 * SecondComponent) / 256.0 - 276.836;
+        public float R => Format == PixelFormat.Rgb ? FirstComponent : (298.082f * FirstComponent + 408.583f * ThirdComponent) / 256.0f - 222.921f;
+        public float G => Format == PixelFormat.Rgb ? SecondComponent : (298.082f * FirstComponent - 100.291f * SecondComponent - 208.120f * ThirdComponent) / 256.0f + 135.576f;
+        public float B => Format == PixelFormat.Rgb ? ThirdComponent : (298.082f * FirstComponent + 516.412f * SecondComponent) / 256.0f - 276.836f;
 
-        public double Y => Format == PixelFormat.YCbCr ? FirstComponent : 16.0 + (65.738 * FirstComponent + 129.057 * SecondComponent + 24.064 * ThirdComponent) / 256.0;
-        public double Cb => Format == PixelFormat.YCbCr ? SecondComponent : 128.0 + (-37.945 * FirstComponent - 74.494 * SecondComponent + 112.439 * ThirdComponent) / 256.0;
-        public double Cr => Format == PixelFormat.YCbCr ? ThirdComponent : 128.0 + (112.439 * FirstComponent - 94.154 * SecondComponent - 18.285 * ThirdComponent) / 256.0;
+        public float Y => Format == PixelFormat.YCbCr ? FirstComponent : 16.0f + (65.738f * FirstComponent + 129.057f * SecondComponent + 24.064f * ThirdComponent) / 256.0f;
+        public float Cb => Format == PixelFormat.YCbCr ? SecondComponent : 128.0f + (-37.945f * FirstComponent - 74.494f * SecondComponent + 112.439f * ThirdComponent) / 256.0f;
+        public float Cr => Format == PixelFormat.YCbCr ? ThirdComponent : 128.0f + (112.439f * FirstComponent - 94.154f * SecondComponent - 18.285f * ThirdComponent) / 256.0f;
         
-        public Pixel(double firstComponent, double secondComponent, double thirdComponent, PixelFormat format)
+        public Pixel(float firstComponent, float secondComponent, float thirdComponent, PixelFormat format)
         {
             FirstComponent = firstComponent;
             SecondComponent = secondComponent;

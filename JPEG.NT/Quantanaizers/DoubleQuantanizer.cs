@@ -2,7 +2,7 @@
 
 namespace JPEG.NT.Quantanaizers
 {
-    public class DoubleQuantanizer : IQuantanizer<double, byte>
+    public class DoubleQuantanizer : IQuantanizer<float, byte>
     {
         private int qualityFactor;
         private int[,] quantizationMatrix;
@@ -29,7 +29,7 @@ namespace JPEG.NT.Quantanaizers
             GetQuantizationMatrix(qualityFactor);
         }
 
-        public byte[,] Quantize(double[,] input)
+        public byte[,] Quantize(float[,] input)
         {
             var width = input.GetLength(1);
             var height = input.GetLength(0);
@@ -44,12 +44,12 @@ namespace JPEG.NT.Quantanaizers
             return result;
         }
 
-        public double[,] DeQuantize(byte[,] input)
+        public float[,] DeQuantize(byte[,] input)
         {
             var width = input.GetLength(1);
             var height = input.GetLength(0);
 
-            var result = new double[height, width];
+            var result = new float[height, width];
             for (var j = 0; j < height; j++)
             for (var i = 0; i < width; i++)
             {

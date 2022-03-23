@@ -13,13 +13,13 @@ namespace JPEG.NT.FreqTransformers
             var length = new int[] {8, 4, 2};
             foreach (var l in length)
             {
-                var c = -2 * Math.PI / l;
+                var c = -2 * (float) Math.PI / l;
                 for (var i = 0; i < l / 2; i++)
                     expTable[8 - l + i] = Complex.FromPolarCoordinates(1, i * c);
             }
         }
 
-        public Complex[,] FreqTransform2D(double[,] input)
+        public Complex[,] FreqTransform2D(float[,] input)
         {
             var complex = new Complex[8, 8];
             for (var j = 0; j < 8; j++)
@@ -29,7 +29,7 @@ namespace JPEG.NT.FreqTransformers
             return FreqTransfrom2D(complex);
         }
 
-        public double[,] IFreqTransform2D(Complex[,] input)
+        public float[,] IFreqTransform2D(Complex[,] input)
         {
             for (var j = 0; j < 8; j++)
             for (var i = 0; i < 8; i++)
@@ -37,10 +37,10 @@ namespace JPEG.NT.FreqTransformers
 
             var ifft = FreqTransfrom2D(input);
 
-            var ifft_real = new double[8, 8];
+            var ifft_real = new float[8, 8];
             for (var j = 0; j < 8; j++)
             for (var i = 0; i < 8; i++)
-                ifft_real[j, i] = ifft[j, i].Real / 64;
+                ifft_real[j, i] = (float) ifft[j, i].Real / 64;
 
             return ifft_real;
         }

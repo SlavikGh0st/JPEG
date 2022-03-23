@@ -2,7 +2,7 @@
 {
     public interface IFreqTransformer<T>
     {
-        T[,] FreqTransform2D(double[,] input);
-        double[,] IFreqTransform2D(T[,] dct);
+        T[,] FreqTransform2D(float[,] input);
+        float[,] IFreqTransform2D(T[,] dct);
     }
 }

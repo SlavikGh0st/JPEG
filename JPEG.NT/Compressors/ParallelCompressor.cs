@@ -13,8 +13,8 @@ namespace JPEG.NT.Compressors
 {
     public class ParallelCompressor : ICompressor
     {
-        private readonly IFreqTransformer<double> freqTransformer;
-        private readonly IQuantanizer<double, byte> quantanizer;
+        private readonly IFreqTransformer<float> freqTransformer;
+        private readonly IQuantanizer<float, byte> quantanizer;
         private readonly IPacker<byte> packer;
 
         public int CompressQuality
@@ -26,8 +26,8 @@ namespace JPEG.NT.Compressors
         public int DCTSize { get; set; }
 
 
-        public ParallelCompressor(IFreqTransformer<double> freqTransformer,
-            IQuantanizer<double, byte> quantanizer,
+        public ParallelCompressor(IFreqTransformer<float> freqTransformer,
+            IQuantanizer<float, byte> quantanizer,
             IPacker<byte> packer)
         {
             DCTSize = 8;
@@ -48,7 +48,7 @@ namespace JPEG.NT.Compressors
                 for (var i = 0; i < matrix.Width; i += DCTSize)
                 {
                     var subMatrix = matrix.GetSubMatrix(j * DCTSize, DCTSize, i, DCTSize);
-                    var componentSelector = new Func<Pixel, double>[] {p => p.Y, p => p.Cb, p => p.Cr};
+                    var componentSelector = new Func<Pixel, float>[] {p => p.Y, p => p.Cb, p => p.Cr};
                     foreach (var channel in subMatrix.GetColorChannels(componentSelector, -128))
                     {
                         var channelFreqs = freqTransformer.FreqTransform2D(channel);

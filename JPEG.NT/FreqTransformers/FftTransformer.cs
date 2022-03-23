@@ -6,7 +6,7 @@ namespace JPEG.NT.FreqTransformers
 {
     public class FftTransformer : IFreqTransformer<Complex>
     {
-        public Complex[,] FreqTransform2D(double[,] input)
+        public Complex[,] FreqTransform2D(float[,] input)
         {
             var height = input.GetLength(0);
             var width = input.GetLength(1);
@@ -19,7 +19,7 @@ namespace JPEG.NT.FreqTransformers
             return FreqTransfrom2D(complex);
         }
 
-        public double[,] IFreqTransform2D(Complex[,] input)
+        public float[,] IFreqTransform2D(Complex[,] input)
         {
             var height = input.GetLength(0);
             var width = input.GetLength(1);
@@ -30,11 +30,11 @@ namespace JPEG.NT.FreqTransformers
                 input[j, i] = new Complex(input[j, i].Real, -input[j, i].Imaginary);
 
             var ifft = FreqTransfrom2D(input);
-            
-            var ifft_real = new double[height, width];
+
+            var ifft_real = new float[height, width];
             for (var j = 0; j < height; j++)
             for (var i = 0; i < width; i++)
-                ifft_real[j, i] = ifft[j, i].Real / size;
+                ifft_real[j, i] = (float) ifft[j, i].Real / size;
 
             return ifft_real;
         }
@@ -51,16 +51,17 @@ namespace JPEG.NT.FreqTransformers
                 var fftRow = TransformRadix2(row);
                 fft.SetRow(i, fftRow);
             }
+
             for (var j = 0; j < height; j++)
             {
                 var col = fft.GetColumn(j);
                 var fftCol = TransformRadix2(col);
                 fft.SetColumn(j, fftCol);
             }
-            
+
             return fft;
         }
-        
+
         private static Complex[] TransformRadix2(Complex[] input)
         {
             var length = input.Length;
@@ -78,7 +79,7 @@ namespace JPEG.NT.FreqTransformers
             even = TransformRadix2(even);
             odd = TransformRadix2(odd);
 
-            var c = -2 * Math.PI / length;
+            var c = -2 * (float) Math.PI / length;
             var dct = new Complex[length];
             for (var i = 0; i < length / 2; i++)
             {

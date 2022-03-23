@@ -23,7 +23,7 @@ namespace JPEG.NT.Common
                 Pixels[i, j] = new Pixel(0, 0, 0, format);
         }
 
-        public Matrix(double[,] firstChannel, double[,] secondChannel, double[,] thirdChannel,
+        public Matrix(float[,] firstChannel, float[,] secondChannel, float[,] thirdChannel,
             PixelFormat format = PixelFormat.Rgb)
         {
             Height = firstChannel.GetLength(0);
@@ -35,7 +35,7 @@ namespace JPEG.NT.Common
                 Pixels[j, i] = new Pixel(firstChannel[j, i], secondChannel[j, i], thirdChannel[j, i], format);
         }
 
-
+        
         public static unsafe explicit operator Matrix(Bitmap bmp)
         {
             var height = bmp.Height - bmp.Height % 8;
@@ -100,6 +100,7 @@ namespace JPEG.NT.Common
 
             return subMatrix;
         }
+        
         public Matrix SetSubMatrix(int rowNumber, int columnNumber, Matrix subMatrix)
         {
             for (var j = 0; j < subMatrix.Height; j++)
@@ -110,11 +111,12 @@ namespace JPEG.NT.Common
 
             return subMatrix;
         }
-        public IEnumerable<double[,]> GetColorChannels(IEnumerable<Func<Pixel, double>> componentSelector, int shift = 0)
+        
+        public IEnumerable<float[,]> GetColorChannels(IEnumerable<Func<Pixel, float>> componentSelector, int shift = 0)
         {
             foreach (var component in componentSelector)
             {
-                var result = new double[Height, Width];
+                var result = new float[Height, Width];
                 for (var j = 0; j < Height; j++)
                 for (var i = 0; i < Width; i++)
                     result[j, i] = component(Pixels[j, i]) + shift;

@@ -4,28 +4,28 @@ using JPEG.NT.Utilities;
 
 namespace JPEG.NT.FreqTransformers
 {
-    public class Rfft8X8Transformer : IFreqTransformer<double>
+    public class Rfft8X8Transformer : IFreqTransformer<float>
     {
         private static readonly Complex[] expTable = new Complex[7];
         private static readonly Complex[] expRTable = new Complex[8];
 
         public Rfft8X8Transformer()
         {
-            var length = new int[] {8, 4, 2};
+            var length = new[] {8, 4, 2};
             foreach (var l in length)
             {
-                var c = -2 * Math.PI / l;
+                var c = -2 * (float) Math.PI / l;
                 for (var i = 0; i < l / 2; i++)
                     expTable[8 - l + i] = Complex.FromPolarCoordinates(1, i * c);
             }
 
             for (var i = 0; i < 8; i++)
-                expRTable[i] = Complex.Exp(new Complex(0, -i * Math.PI / 16));
+                expRTable[i] = Complex.Exp(new Complex(0, -i * (float) Math.PI / 16));
         }
-        
-        public double[,] FreqTransform2D(double[,] input)
+
+        public float[,] FreqTransform2D(float[,] input)
         {
-            var fft = new double[8, 8];
+            var fft = new float[8, 8];
             for (var i = 0; i < 8; i++)
             {
                 var row = input.GetRow(i);
@@ -42,57 +42,57 @@ namespace JPEG.NT.FreqTransformers
 
             return fft;
         }
-        
-        public double[,] IFreqTransform2D(double[,] dct)
+
+        public float[,] IFreqTransform2D(float[,] dct)
         {
-            var fft = new double[8, 8];
+            var fft = new float[8, 8];
             for (var i = 0; i < 8; i++)
             {
                 var row = dct.GetRow(i);
                 var fftRow = IFreqTransform1D(row);
                 fft.SetRow(i, fftRow);
             }
-            
+
             for (var j = 0; j < 8; j++)
             {
                 var col = fft.GetColumn(j);
                 var fftCol = IFreqTransform1D(col);
                 fft.SetColumn(j, fftCol);
             }
-            
+
             return fft;
         }
 
-        private double[] FreqTransform1D(double[] input)
+        private float[] FreqTransform1D(float[] input)
         {
             var complex = new Complex[8];
             for (var i = 0; i < 8; i++)
                 complex[i] = input[i];
-            
+
             var fft = TransformRadix2(complex);
 
             for (var i = 0; i < 8; i++)
-                input[i] = (fft[i] * expRTable[i]).Real;
+                input[i] = (float) (fft[i] * expRTable[i]).Real;
 
             return input;
         }
 
-        private double[] IFreqTransform1D(double[] input)
+        private float[] IFreqTransform1D(float[] input)
         {
-            input[0] /= 2; 
-            
+            input[0] /= 2;
+
             var complex = new Complex[8];
             for (var i = 0; i < 8; i++)
                 complex[i] = input[i] * expRTable[i];
-            
+
             var ifft = TransformRadix2(complex);
-            
+
             for (var i = 0; i < 8; i++)
-                input[i] = ifft[i].Real / 4;
+                input[i] = (float) ifft[i].Real / 4;
 
             return input;
         }
-        
+
         private static Complex[] TransformRadix2(Complex[] input)
         {
             var length = input.Length;

@@ -17,7 +17,7 @@ namespace JPEG.Tests
     [TestFixture]
     public class Compress
     {
-        private readonly string testFileName = @"Images\sample.bmp";
+        private readonly string testFileName = @"Images\earth.bmp";
         private readonly string compressedFileName = "compressed";
         private Matrix matrix;
         private JPEG.Images.Matrix origMatrix;
