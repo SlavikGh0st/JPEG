@@ -356,7 +356,11 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-!./debug/
-
 # Ignore .idea files
 .idea/
+
+!./debug/
+
+# Big test file
+JPEG.Tests/Images/earth.bmp
+
