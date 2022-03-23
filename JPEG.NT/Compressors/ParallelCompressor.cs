@@ -13,8 +13,8 @@ namespace JPEG.NT.Compressors
 {
     public class ParallelCompressor : ICompressor
     {
-        private readonly IFreqTransformer<float> freqTransformer;
-        private readonly IQuantanizer<float, byte> quantanizer;
+        private readonly IFreqTransformer<double> freqTransformer;
+        private readonly IQuantanizer<double, byte> quantanizer;
         private readonly IPacker<byte> packer;
 
         public int CompressQuality
@@ -26,8 +26,8 @@ namespace JPEG.NT.Compressors
         public int DCTSize { get; set; }
 
 
-        public ParallelCompressor(IFreqTransformer<float> freqTransformer,
-            IQuantanizer<float, byte> quantanizer,
+        public ParallelCompressor(IFreqTransformer<double> freqTransformer,
+            IQuantanizer<double, byte> quantanizer,
             IPacker<byte> packer)
         {
             DCTSize = 8;
@@ -40,7 +40,7 @@ namespace JPEG.NT.Compressors
 
         public CompressedImage Compress(Matrix matrix)
         {
-            var allQuantizedBytes = new byte[matrix.Height / DCTSize, matrix.Width * DCTSize * 3];
+            var allQuantizedBytes = new byte[matrix.Height * matrix.Width * 3];
 
             Parallel.For(0, matrix.Height / DCTSize, j =>
             {
@@ -48,23 +48,26 @@ namespace JPEG.NT.Compressors
                 for (var i = 0; i < matrix.Width; i += DCTSize)
                 {
                     var subMatrix = matrix.GetSubMatrix(j * DCTSize, DCTSize, i, DCTSize);
-                    var componentSelector = new Func<Pixel, float>[] {p => p.Y, p => p.Cb, p => p.Cr};
+                    var componentSelector = new Func<Pixel, double>[] {p => p.Y, p => p.Cb, p => p.Cr};
+                    var ch = 0;
                     foreach (var channel in subMatrix.GetColorChannels(componentSelector, -128))
                     {
                         var channelFreqs = freqTransformer.FreqTransform2D(channel);
                         var quantizedBytes = quantanizer.Quantize(channelFreqs);
-                        var packedBytes = packer.Pack(quantizedBytes);
-                        rowQuantizedBytes.AddRange(packedBytes);
+                        var packedBytes = packer.Pack(quantizedBytes).ToArray();
+
+                        SetSubVector(ref allQuantizedBytes, packedBytes,
+                            DCTSize * (3 * j * matrix.Width + 3 * i + ch * DCTSize),
+                            DCTSize * DCTSize);
+                        ch++;
                     }
                 }
-
-                allQuantizedBytes.SetRow(j, rowQuantizedBytes.ToArray());
             });
 
 
             long bitsCount;
             Dictionary<BitsWithLength, byte> decodeTable;
-            var compressedBytes = HuffmanCodec.Encode(allQuantizedBytes.ToEnumerable(), out decodeTable, out bitsCount);
+            var compressedBytes = HuffmanCodec.Encode(allQuantizedBytes, out decodeTable, out bitsCount);
 
             return new CompressedImage
             {
@@ -109,6 +112,12 @@ namespace JPEG.NT.Compressors
                 result[i] = input[from + i];
 
             return result;
+        }
+
+        private void SetSubVector(ref byte[] parent, byte[] input, int from, int count)
+        {
+            for (var i = 0; i < count; i++)
+                parent[from + i] = input[i];
         }
     }
 }
